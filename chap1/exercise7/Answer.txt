@@ -1,0 +1,2 @@
+If the dynamic array has not been deallocated: indicates that a memory leak has occurred.
+If the dynamic array is deallocated incorrectly: indicates that the memory assignment operator and memory release operator do not match.
