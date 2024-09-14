@@ -1,7 +1,7 @@
 #include <iostream>
 #include <initializer_list>
-#include <cassert>
 #include <valarray>
+#include <cmath>
 
 class polynomial
 {
@@ -9,14 +9,14 @@ class polynomial
 		polynomial(unsigned degree) 
 			: degree{degree}, co{std::valarray<double>(degree + 1)} {};
 		
-		polynomial(unsigned degree, std::valarray<double> co) 
-			: degree{degree}, co{co} {};
+		polynomial(std::initializer_list<double> cos)
+			: degree{(unsigned int)cos.size() - 1}, co{std::valarray<double>(cos)} {};
 		
-		polynomial& operator=(std::valarray<double> cos)
+		polynomial& operator=(std::initializer_list<double> cos)
 		{
-			assert((degree + 1) == cos.size());
-			for(unsigned i = 0; i <= degree; i++)
-				co[degree- i] = cos[i];
+			degree = (unsigned int)cos.size() - 1;
+			co = std::valarray<double>(cos);
+
 			return *this;
 		};
 
@@ -30,16 +30,7 @@ class polynomial
 			return *this;
 		};
 		
-		polynomial& operator=(polynomial& p)
-		{
-			degree = p.degree;
-			std::valarray<double> temp(degree + 1);
-			for(unsigned i = 0; i <= degree; i++)
-				temp[i] = p.co[i];
-			co = temp;
-
-			return *this;
-		};
+		polynomial& operator=(polynomial& p) = default;
 
 		polynomial operator+(const polynomial& p)
 		{
@@ -50,27 +41,24 @@ class polynomial
 				cop = co + p.co;
 			else {
 				std::valarray<double> temp(allDegree + 1);
+				double diffSizeOfPdd = abs(p.degree - degree);
 				if(allDegree == p.degree) {
-					for(unsigned i = allDegree; i >= 1; i--)
-						if(i > degree)
+					for(unsigned i = 0; i <= allDegree; i++)
+						if(i < diffSizeOfPdd)
 							temp[i] = 0;
 						else
-							temp[i] = co[i];
-					if(degree >= 0)
-						temp[0] = co[0];
+							temp[i] = co[i - diffSizeOfPdd];
 					cop = temp + p.co;
 				} else {
-					for(unsigned i = allDegree; i >= 1; i--)
-						if(i > p.degree)
+					for(unsigned i = 0; i <= allDegree; i++)
+						if(i < diffSizeOfPdd)
 							temp[i] = 0;
 						else
-							temp[i] = p.co[i];
-					if(p.degree >= 0)
-						temp[0] = p.co[0];
+							temp[i] = p.co[i - diffSizeOfPdd];
 					cop = co + temp;
 				}
 			}
-			return polynomial(allDegree, cop);
+			return polynomial(cop);
 		};
 		
 		polynomial operator-(const polynomial& p)
@@ -82,45 +70,44 @@ class polynomial
 				cop = co - p.co;
 			else {
 				std::valarray<double> temp(allDegree + 1);
+				double diffSizeOfPdd = abs(p.degree - degree);
 				if(allDegree == p.degree) {
-					for(unsigned i = allDegree; i >= 1; i--)
-						if(i > degree)
+					for(unsigned i = 0; i <= allDegree; i++)
+						if(i < diffSizeOfPdd)
 							temp[i] = 0;
 						else
-							temp[i] = co[i];
-					if(degree >= 0)
-						temp[0] = co[0];
+							temp[i] = co[i - diffSizeOfPdd];
 					cop = temp - p.co;
 				} else {
-					for(unsigned i = allDegree; i >= 1; i--)
-						if(i > p.degree)
+					for(unsigned i = 0; i <= allDegree; i++)
+						if(i < diffSizeOfPdd)
 							temp[i] = 0;
 						else
-							temp[i] = p.co[i];
-					if(p.degree >= 0)
-						temp[0] = p.co[0];
+							temp[i] = p.co[i - diffSizeOfPdd];
 					cop = co - temp;
 				}
 			}
-			return polynomial(allDegree, cop);
+			return polynomial(cop);
 		};
 
 		friend std::ostream& operator<<(std::ostream& os, const polynomial& p)
 		{
-			os << p.co[p.degree] << "x^" << p.degree;
-			for(unsigned i = p.degree - 1; i >= 1; i--) {
+			os << p.co[0] << "x^" << p.degree;
+			for(unsigned i = 1; i < p.degree; i++) {
 				if(p.co[i] == 0)
 					continue;
-				os << " + " << p.co[i] << "x^" << i;
+				os << " + " << p.co[i] << "x^" << p.degree - i;
 			}
-			if(p.co[0] != 0)
-				os << " + " << p.co[0];
+			if(p.co[p.degree] != 0)
+				os << " + " << p.co[p.degree];
 			return os;
 		};
 
 		~polynomial() = default;
 	private:
+		polynomial(std::valarray<double> cop)
+			: degree{(unsigned)cop.size() - 1}, co{cop} {};
+
 		std::valarray<double> co;
 		unsigned degree;
-
 };
