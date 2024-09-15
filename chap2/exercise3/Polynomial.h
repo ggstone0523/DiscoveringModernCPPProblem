@@ -50,7 +50,6 @@ class polynomial
 	private:
 		std::valarray<double> co;
 		unsigned degree;
-
 };
 
 polynomial makeQuadFunc(double c2, double c1, double c0);
