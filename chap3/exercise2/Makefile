@@ -7,7 +7,7 @@ HEADERS = $(wildcard ./*.h)
 all: build test
 
 build: $(SRCS) $(HEADERS)
-	$(CC) -g -std=c++20 -o $(TARGET) $^
+	$(CC) -g -o $(TARGET) $^
 
 test:
 	./$(TARGET)

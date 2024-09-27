@@ -31,12 +31,57 @@ std::string to_tuple_string(P ...args)
 	return s;
 }
 
+template <typename ...P>
+std::string to_tuple_string2(P ...args)
+{
+	std::stringstream os;
+	std::initializer_list init{(to_string(args))...};
+	os << '(';
+	for(auto i : init)
+		os << i << ", ";
+        os.seekp(-2, std::ios::cur);
+	os << ')';
+	return os.str();	
+}
+
+template <typename T>
+std::string to_string(T arg, std::string marks)
+{
+	std::stringstream os;
+	os << arg << marks;
+	return os.str();
+}
+
+template <typename ...P>
+std::string __to_tuple_string3(P& ...args)
+{
+
+	return (to_string(args, ", ") + ...);
+}
+
+template <typename ...P>
+std::string to_tuple_string3(P ...args)
+{
+	std::stringstream os;
+	os << '(';
+	os << __to_tuple_string3(args...);
+        os.seekp(-2, std::ios::cur);
+	os << ')';
+	return os.str();
+}
+
 int main()
 {
-	std::string s;
-	s = to_tuple_string(1, "hello", "hi", "my", "name", "is", "choi", "yusun");
+	std::string s1, s2, s3;
 
-	std::cout << s << std::endl;
+	s1 = to_tuple_string(1, -3.14, 'a', "hello", "hi", "my", "name", "is", "choi", "yusun");
+	std::cout << "variadic template: " << s1 << std::endl;
+	
+	s2 = to_tuple_string2(1, -3.14, 'a', "hello", "hi", "my", "name", "is", "choi", "yusun");
+	std::cout << " initializer list: " << s2 << std::endl;
+	
+	s3 = to_tuple_string3(1, -3.14, 'a', "hello", "hi", "my", "name", "is", "choi", "yusun");
+	std::cout << "  fold expression: " << s3 << std::endl;
 
 	return 0;
 }
