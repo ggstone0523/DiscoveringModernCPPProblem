@@ -1,0 +1,132 @@
+#include <iostream>
+#include <numeric>
+#include <cassert>
+
+template <typename T>
+concept IntLike = std::is_integral_v<T>;
+
+template <typename T>
+	requires IntLike<T>
+class rational
+{
+	public:
+		rational(T inputN, T inputD = 1) : numerator{inputN}, denominator{inputD}
+		{
+			assert(inputD != 0);
+			if(inputD < 0) {
+				numerator *= -1;
+				denominator *= -1;
+			}
+			setIrrFrac();
+		};
+
+		rational& operator=(const rational& r)
+		{
+			numerator = r.numerator;
+			denominator = r.denominator;
+
+			return *this;
+		};
+		
+		rational& operator=(rational&& r) noexcept
+		{
+			numerator = r.numerator;
+			denominator = r.denominator;
+			r.numerator = 0;
+			r.denominator = 1;
+
+			return *this;
+		};
+
+		rational operator+(const rational& r)
+		{
+			if(denominator == r.denominator)
+				return rational(numerator + r.numerator, denominator);
+			else
+				return rational((numerator * r.denominator) + \
+						( r.numerator * denominator),
+						denominator * r.denominator);
+		};
+		
+		rational operator-(const rational& r)
+		{
+			if(denominator == r.denominator)
+				return rational(numerator - r.numerator, denominator);
+			else
+				return rational((numerator * r.denominator) - \
+						( r.numerator * denominator),
+						denominator * r.denominator);
+		};
+		
+		rational operator*(const rational& r)
+		{
+			return rational(numerator * r.numerator, denominator * r.denominator);
+		};
+		
+		rational operator/(const rational& r)
+		{
+			return rational(numerator * r.denominator, denominator * r.numerator);
+		};
+		
+		rational& operator+=(const rational& r)
+		{
+			if(denominator == r.denominator)
+				numerator = numerator + r.numerator;
+			else {
+				numerator = numerator * r.denominator + r.numerator * denominator;
+				denominator = denominator * r.denominator;
+			}
+			setIrrFrac();
+			return *this;
+		};
+		
+		rational& operator-=(const rational& r)
+		{
+			if(denominator == r.denominator)
+				numerator = numerator - r.numerator;
+			else {
+				numerator = numerator * r.denominator - r.numerator * denominator;
+				denominator = denominator * r.denominator;
+			}
+			setIrrFrac();
+			return *this;
+		};
+		
+		rational& operator*=(const rational& r)
+		{
+			numerator = numerator * r.numerator;
+			denominator = denominator * r.denominator;
+			setIrrFrac();
+			return *this;
+		};
+		
+		rational& operator/=(const rational& r)
+		{
+			numerator = numerator * r.denominator;
+			denominator = denominator * r.numerator;
+			setIrrFrac();
+			return *this;
+		};
+
+		friend std::ostream& operator<<(std::ostream& os, const rational& r)
+		{
+			if(r.numerator != 0)
+				return os << "(" << r.numerator << " / " << r.denominator << ")";
+			else
+				return os << "(0)";
+		};
+
+		~rational() = default;
+	private:
+		void setIrrFrac()
+		{
+			if(numerator != 0) {
+				T ndGcd = std::gcd(numerator, denominator);
+				numerator = numerator / ndGcd;
+				denominator = denominator / ndGcd;
+			}
+		};
+		
+		T numerator;
+		T denominator;
+};
