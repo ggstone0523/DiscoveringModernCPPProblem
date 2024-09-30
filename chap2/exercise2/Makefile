@@ -7,7 +7,7 @@ HEADERS = $(wildcard ./*.h)
 all: build test
 
 build: $(SRCS) $(HEADERS)
-	$(CC) -fcompare-debug-second -g -o $(TARGET) $^
+	$(CC) -g -o $(TARGET) $^
 
 test:
 	./$(TARGET)

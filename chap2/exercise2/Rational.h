@@ -7,7 +7,11 @@ class rational
 	public:
 		rational(int inputN, int inputD = 1) : numerator{inputN}, denominator{inputD}
 		{
-			assert(inputD > 0);
+			assert(inputD != 0);
+			if(inputD < 0) {
+				numerator *= -1;
+				denominator *= -1;
+			}
 			setIrrFrac();
 		};
 
@@ -101,16 +105,21 @@ class rational
 
 		friend std::ostream& operator<<(std::ostream& os, const rational& r)
 		{
-			return os << "(" << r.numerator << " / " << r.denominator << ")";
+			if(r.numerator != 0)
+				return os << "(" << r.numerator << " / " << r.denominator << ")";
+			else
+				return os << "(0)";
 		};
 
 		~rational() = default;
 	private:
 		void setIrrFrac()
 		{
-			int ndGcd = std::gcd(numerator, denominator);
-			numerator = numerator / ndGcd;
-			denominator = denominator / ndGcd;
+			if(numerator != 0) {
+				int ndGcd = std::gcd(numerator, denominator);
+				numerator = numerator / ndGcd;
+				denominator = denominator / ndGcd;
+			}
 		};
 		
 		int numerator;
