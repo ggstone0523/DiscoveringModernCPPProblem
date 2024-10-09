@@ -1,6 +1,6 @@
 #include "Trapezoid.h"
 
-// general programming method
+// generic programming method
 template <typename F, typename T>
 auto trapezoid(F f, const T& a, const T& b)
 {
@@ -29,7 +29,7 @@ double trapezoidInherit(functor_base const& f, double a, double b)
 
 int main()
 {
-	std::cout << "using general programming method" << std::endl;
+	std::cout << "using generic programming method" << std::endl;
 	std::cout << "-----------------------------------------------------------------------------------------------------" << std::endl;
 	std::cout << "If x in [0, 4], integrate f=exp(3x) using trapezoid rule: " << trapezoid(exp3t{}, 0.0, 4.0) << std::endl;
 	std::cout << "If x in [0, 4], integrate (if x < 1, f=sin(x)), (if x >= 1, f=cos(x)) using trapezoid rule: " << trapezoid(sinonecost{}, 0.0, 4.0) << std::endl;

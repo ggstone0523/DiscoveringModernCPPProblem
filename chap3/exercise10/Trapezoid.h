@@ -1,11 +1,11 @@
 #include <iostream>
 #include <cmath>
 
-// general programming method
+// generic programming method
 struct exp3t
 {
 	template <typename T>
-	auto operator() (T x) const
+	auto operator() (const T& x) const
 	{
 		return std::exp(3.0 * x);
 	}
@@ -14,7 +14,7 @@ struct exp3t
 struct sinonecost
 {
 	template <typename T>
-	auto operator() (T x) const
+	auto operator() (const T& x) const
 	{
 		return (x < 1) ? (std::sin(x)) : (std::cos(x));
 	}
@@ -24,15 +24,15 @@ template <typename F, typename H>
 class findiff
 {
 	public:
-		findiff(F f, H h) : f{f}, h{h} {}
+		findiff(const F& f, const H& h) : f{f}, h{h} {}
 		
 		template <typename T>
-		auto operator() (T x) const
+		auto operator() (const T& x) const
 		{
 			return (f(x + h) - f(x)) / h;
 		}
 	private:
-		F f;
+		const F& f;
 		H h;
 };
 
