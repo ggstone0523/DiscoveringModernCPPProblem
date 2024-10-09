@@ -20,19 +20,20 @@ struct sinonecost
 	}
 };
 
-template <typename F, typename T>
+template <typename F, typename H>
 class findiff
 {
 	public:
-		findiff(F f, T h) : f{f}, h{h} {} 
+		findiff(F f, H h) : f{f}, h{h} {}
 		
+		template <typename T>
 		auto operator() (T x) const
 		{
 			return (f(x + h) - f(x)) / h;
 		}
 	private:
 		F f;
-		T h;
+		H h;
 };
 
 template <typename F, typename T>
