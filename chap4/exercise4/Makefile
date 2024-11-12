@@ -1,5 +1,5 @@
 CC = g++
-TARGET = Julia
+TARGET = JuliaMandel
 SRCS = $(wildcard ./*.cpp)
 OBJS = $(patsubst %.cpp, %.o, $(SRCS))
 HEADERS = $(wildcard ./*.h)
