@@ -7,10 +7,10 @@ HEADERS = $(wildcard ./*.h)
 all: build test
 
 build: $(SRCS) $(HEADERS)
-	$(CC) -g -o $(TARGET) $^
+	$(CC) -g -std=c++20 -o $(TARGET) $^
 
 test:
-	./$(TARGET)
+	valgrind ./$(TARGET)
 
 clean:
 	rm -rf $(TARGET)
