@@ -1,49 +1,68 @@
-//This Code is not have logic for graphic
+#include <cstdlib>
 #include <cstdint>
+#include <cassert>
 #include <complex>
+#include <SDL2/SDL.h>
+#include <iostream>
+#include <mutex>
+#include <thread>
+#include <vector>
 
-class SDL_Surface
-{};
+using namespace std;
 
-class julia_mandel_pixel
+const int default_xdim = 1200;
+const int default_ydim = 800;
+
+struct sdl_error;
+class mandel_julia_pixel;
+
+inline void sdl_check(bool allclear);
+inline void put_pixel(SDL_Surface* screen, int x, int y, uint32_t pixel);
+void update_screen(SDL_Window* sdlWindow, SDL_Surface* screen, bool is_julia, complex<float> k,
+		   int xstart, int ystart, int xend, int yend, int xdim, int ydim, const int max_iter);
+SDL_Window* show_screen(const char* str, bool is_julia, complex<float> k, int xdim, int ydim, const int max_iter);
+
+struct sdl_error {};
+
+class mandel_julia_pixel
 {
 	public:
-		julia_mandel_pixel(SDL_Surface* screen, double r, double i, double x, double y,
-				int xdim, int ydim, int max_iter)
-			:screen{screen}, max_iter{max_iter}, iter{0}, k{r, i}, c{x, y}, isThisJulia{true}
+		mandel_julia_pixel(SDL_Surface* screen, int x, int y, int xdim, int ydim, 
+				int max_iter, bool is_julia = false, complex<float> k = {0, 0})
+			: screen(screen), max_iter(max_iter), iter(0), c(x, y), is_julia(is_julia), k(k)
 		{
-			c *= 2.4f / static_cast<double>(ydim);
-			c -= std::complex<double>(1.2 * xdim / ydim + 0.5, 1.2);
-			iterate();
-		}
-		
-		julia_mandel_pixel(SDL_Surface* screen, double x, double y,
-				int xdim, int ydim, int max_iter)
-			:screen{screen}, max_iter{max_iter}, iter{0}, k{0.0, 0.0}, c{x, y}, isThisJulia{false}
-		{
-			c *= 2.4f / static_cast<double>(ydim);
-			c -= std::complex<double>(1.2 * xdim / ydim + 0.5, 1.2);
+			if(is_julia) {
+				c *= 2.4f * 1.2f / static_cast<float>(ydim);
+				c -= complex<float>(1.2 * xdim / ydim * 1.2, 1.2 * 1.2);
+			} else {
+				c *= 2.4f / static_cast<float>(ydim);
+				c -= complex<float>(1.2 * xdim / ydim + 0.5, 1.2);
+			}
 			iterate();
 		}
 
 		int iterations() const { return iter; }
-
-		uint32_t color() const { return 0; }
+		uint32_t color() const 
+		{
+			if (iter == max_iter) return SDL_MapRGB(screen->format, 255, 255, 255);
+			const int ci= 512 * iter / max_iter;
+			return iter < max_iter/2 ? SDL_MapRGB(screen->format, 255-ci, 255, 255)
+						 : SDL_MapRGB(screen->format, 0, 510-ci, 510-ci);
+		}
 	private:
 		void iterate()
 		{
-			std::complex<double> z = c;
-			for(; iter < max_iter && std::norm(z) <= 4.0f; iter++)
-				if(isThisJulia)
+			complex<float> z = c;
+			for (; iter < max_iter && norm(z) <= 4.0f; iter++)
+				if(is_julia)
 					z = z * z + k;
 				else
 					z = z * z + c;
 		};
-
+		
 		SDL_Surface* screen;
-		int max_iter;
+		const int max_iter;
 		int iter;
-		std::complex<double> c;
-		std::complex<double> k;
-		bool isThisJulia;
+		complex<float> c, k;
+		bool is_julia;
 };

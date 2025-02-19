@@ -7,7 +7,7 @@ HEADERS = $(wildcard ./*.h)
 all: build test
 
 build: $(SRCS) $(HEADERS)
-	$(CC) -g -o $(TARGET) $^
+	$(CC) -g -o $(TARGET) $^ `sdl2-config --cflags --libs`
 
 test:
 	./$(TARGET)
